@@ -1,7 +1,7 @@
 [
 {
-  "directory": "/home/osboxes/projects/Test_DB/build",
-  "command": "/usr/bin/x86_64-linux-gnu-gcc-7   -g   -o CMakeFiles/testdb.dir/testdb.c.o   -c /home/osboxes/projects/Test_DB/testdb.c",
-  "file": "/home/osboxes/projects/Test_DB/testdb.c"
+  "directory": "/home/ingvar/Documents/projects/Test_DB/build",
+  "command": "/usr/bin/gcc   -g -o CMakeFiles/testdb.dir/testdb.c.o -c /home/ingvar/Documents/projects/Test_DB/testdb.c",
+  "file": "/home/ingvar/Documents/projects/Test_DB/testdb.c"
 }
 ]

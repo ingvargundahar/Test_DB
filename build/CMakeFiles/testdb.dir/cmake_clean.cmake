@@ -1,7 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/testdb.dir/testdb.c.o"
-  "testdb.pdb"
+  "CMakeFiles/testdb.dir/testdb.c.o.d"
   "testdb"
+  "testdb.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

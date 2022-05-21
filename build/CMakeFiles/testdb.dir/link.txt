@@ -1,1 +1,1 @@
-/usr/bin/x86_64-linux-gnu-gcc-7 -g  -rdynamic CMakeFiles/testdb.dir/testdb.c.o  -o testdb -lsqlite3 
+/usr/bin/gcc -g -rdynamic CMakeFiles/testdb.dir/testdb.c.o -o testdb  -lsqlite3 
