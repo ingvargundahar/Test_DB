@@ -12,24 +12,25 @@ DROP TABLE auditorium;
 */
 
 CREATE TABLE auditorium(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     label varchar(50),
     rows int,
     columns int
 );
 
 CREATE TABLE class(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     classname varchar(50)
 );
 
 CREATE TABLE subject(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
+    subjectLabel varchar(10),
     subject varchar(100)
 );
 
 CREATE TABLE lecturer(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     lecturer_firstname varchar(50),
     lecturer_lastname varchar(50),
     subjectId int,
@@ -37,13 +38,13 @@ CREATE TABLE lecturer(
 );
 
 CREATE TABLE student(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     personalIdentifier int, -- 10-stellige Nummer, FH-Ausweis (Personenkennzeichen)
     username varchar(10) -- laut CIS "username", Schema "ic21bxxx"
 );
 
 CREATE TABLE exam(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     auditoriumId int,
     classId int,
     lecturerId int,
@@ -64,7 +65,7 @@ CREATE TABLE class_student(
 );
 
 CREATE TABLE student_exam(
-    id int IDENTITY(1,1) PRIMARY KEY,
+    id INTEGER PRIMARY KEY NOT NULL,
     studentId int,
     examId int,
     seat_row int,
