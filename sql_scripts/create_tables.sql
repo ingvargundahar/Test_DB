@@ -38,7 +38,8 @@ CREATE TABLE lecturer(
 
 CREATE TABLE student(
     id int IDENTITY(1,1) PRIMARY KEY,
-    studentId varchar(10) 
+    personalIdentificationNumber int, -- 10-stellige Nummer, FH-Ausweis
+    username varchar(10) -- laut CIS "username", Schema "ic21bxxx"
 );
 
 CREATE TABLE exam(
@@ -65,6 +66,8 @@ CREATE TABLE student_auditorium(
     id int IDENTITY(1,1) PRIMARY KEY,
     studentId int,
     auditoriumId int,
+    seat_row int,
+    seat_column int,
     CONSTRAINT FK_StudentStudentAuditorium FOREIGN KEY (studentId) REFERENCES student(id),
     CONSTRAINT FK_AuditoriumStudentAuditorium FOREIGN KEY (auditoriumId) REFERENCES auditorium(id)
 );
