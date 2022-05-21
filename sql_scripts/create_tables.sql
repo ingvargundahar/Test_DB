@@ -1,14 +1,14 @@
 -- SQLite
 
 /*
-DROP TABLE auditorium;
-DROP TABLE class;
-DROP TABLE subject;
-DROP TABLE lecturer;
-DROP TABLE student;
-DROP TABLE exam;
+DROP TABLE student_exam;
 DROP TABLE class_student;
-DROP TABLE student_auditorium;
+DROP TABLE exam;
+DROP TABLE student;
+DROP TABLE lecturer;
+DROP TABLE subject;
+DROP TABLE class;
+DROP TABLE auditorium;
 */
 
 CREATE TABLE auditorium(
@@ -38,7 +38,7 @@ CREATE TABLE lecturer(
 
 CREATE TABLE student(
     id int IDENTITY(1,1) PRIMARY KEY,
-    personalIdentificationNumber int, -- 10-stellige Nummer, FH-Ausweis
+    personalIdentifier int, -- 10-stellige Nummer, FH-Ausweis (Personenkennzeichen)
     username varchar(10) -- laut CIS "username", Schema "ic21bxxx"
 );
 
@@ -59,15 +59,16 @@ CREATE TABLE class_student(
     classId int,
     studentId int,
     CONSTRAINT FK_ClassClassStudent FOREIGN KEY (classId) REFERENCES class(id),
-    CONSTRAINT FK_StudentClassStudent FOREIGN KEY (studentId) REFERENCES student(id)
+    CONSTRAINT FK_StudentClassStudent FOREIGN KEY (studentId) REFERENCES student(id),
+    CONSTRAINT PK_ClassId_StudentId PRIMARY KEY (classId, studentId)
 );
 
-CREATE TABLE student_auditorium(
+CREATE TABLE student_exam(
     id int IDENTITY(1,1) PRIMARY KEY,
     studentId int,
-    auditoriumId int,
+    examId int,
     seat_row int,
     seat_column int,
-    CONSTRAINT FK_StudentStudentAuditorium FOREIGN KEY (studentId) REFERENCES student(id),
-    CONSTRAINT FK_AuditoriumStudentAuditorium FOREIGN KEY (auditoriumId) REFERENCES auditorium(id)
+    CONSTRAINT FK_StudentStudentExam FOREIGN KEY (studentId) REFERENCES student(id),
+    CONSTRAINT FK_ExamStudentExam FOREIGN KEY (examId) REFERENCES exam(id)
 );
