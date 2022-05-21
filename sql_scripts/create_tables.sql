@@ -1,12 +1,14 @@
 -- SQLite
 
 /*
-DROP TABLE lecture;
-DROP TABLE class_students;
-DROP TABLE class;
-DROP TABLE students;
 DROP TABLE auditorium;
-DROP TABLE booking;
+DROP TABLE class;
+DROP TABLE subject;
+DROP TABLE lecturer;
+DROP TABLE student;
+DROP TABLE exam;
+DROP TABLE class_student;
+DROP TABLE student_auditorium;
 */
 
 CREATE TABLE auditorium(
@@ -16,36 +18,53 @@ CREATE TABLE auditorium(
     columns int
 );
 
-CREATE TABLE booking(
-    id int IDENTITY(1,1) PRIMARY KEY,
-    auditoriumId int,
-    classId int,
-    lectureId int,
-    startDate datetime,
-    endDate datetime,
-    CONSTRAINT FK_AuditoriumBooking FOREIGN KEY (auditoriumId) REFERENCES auditorium(id),
-    CONSTRAINT FK_ClassBooking FOREIGN KEY (classId) REFERENCES class(id),
-    CONSTRAINT FK_LectureBooking FOREIGN KEY (lectureId) REFERENCES lecture(id)
-);
-
 CREATE TABLE class(
     id int IDENTITY(1,1) PRIMARY KEY,
     classname varchar(50)
 );
 
-CREATE TABLE lecture(
+CREATE TABLE subject(
     id int IDENTITY(1,1) PRIMARY KEY,
-    lecture varchar(50)
+    subject varchar(100)
 );
 
-CREATE TABLE students(
+CREATE TABLE lecturer(
+    id int IDENTITY(1,1) PRIMARY KEY,
+    lecturer_firstname varchar(50),
+    lecturer_lastname varchar(50),
+    subjectId int,
+    CONSTRAINT FK_SubjectLecturer FOREIGN KEY (subjectId) REFERENCES subject(id)
+);
+
+CREATE TABLE student(
     id int IDENTITY(1,1) PRIMARY KEY,
     studentId varchar(10) 
 );
 
-CREATE TABLE class_students(
+CREATE TABLE exam(
+    id int IDENTITY(1,1) PRIMARY KEY,
+    auditoriumId int,
+    classId int,
+    lecturerId int,
+    startDate datetime,
+    endDate datetime,
+    capacity int, --25, 50, 100
+    CONSTRAINT FK_AuditoriumExam FOREIGN KEY (auditoriumId) REFERENCES auditorium(id),
+    CONSTRAINT FK_ClassExam FOREIGN KEY (classId) REFERENCES class(id),
+    CONSTRAINT FK_LecturerExam FOREIGN KEY (lecturerId) REFERENCES lecturer(id)
+);
+
+CREATE TABLE class_student(
     classId int,
     studentId int,
-    CONSTRAINT FK_ClassClassStudents FOREIGN KEY (classId) REFERENCES class(id),
-    CONSTRAINT FK_StudentClassStudents FOREIGN KEY (studentId) REFERENCES student(id)
+    CONSTRAINT FK_ClassClassStudent FOREIGN KEY (classId) REFERENCES class(id),
+    CONSTRAINT FK_StudentClassStudent FOREIGN KEY (studentId) REFERENCES student(id)
+);
+
+CREATE TABLE student_auditorium(
+    id int IDENTITY(1,1) PRIMARY KEY,
+    studentId int,
+    auditoriumId int,
+    CONSTRAINT FK_StudentStudentAuditorium FOREIGN KEY (studentId) REFERENCES student(id),
+    CONSTRAINT FK_AuditoriumStudentAuditorium FOREIGN KEY (auditoriumId) REFERENCES auditorium(id)
 );
