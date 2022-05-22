@@ -2,13 +2,17 @@
 
 /*
 DROP TABLE student_exam;
-DROP TABLE class_student;
 DROP TABLE exam;
 DROP TABLE student;
+DROP TABLE class_lecturer;
 DROP TABLE lecturer;
 DROP TABLE subject;
 DROP TABLE class;
 DROP TABLE auditorium;
+*/
+
+/* --- old tables ---
+DROP TABLE class_student;
 */
 
 CREATE TABLE auditorium(
@@ -23,6 +27,7 @@ CREATE TABLE class(
     classname varchar(50)
 );
 
+
 CREATE TABLE subject(
     id INTEGER PRIMARY KEY NOT NULL,
     subjectLabel varchar(10),
@@ -31,16 +36,26 @@ CREATE TABLE subject(
 
 CREATE TABLE lecturer(
     id INTEGER PRIMARY KEY NOT NULL,
-    lecturer_firstname varchar(50),
-    lecturer_lastname varchar(50),
+    firstname varchar(50),
+    lastname varchar(50),
     subjectId int,
     CONSTRAINT FK_SubjectLecturer FOREIGN KEY (subjectId) REFERENCES subject(id)
+);
+
+CREATE TABLE class_lecturer(
+    lecturerId int,
+    classId int,
+    CONSTRAINT FK_LecturerClassLecturer FOREIGN KEY (lecturerId) REFERENCES lecturer(id),
+    CONSTRAINT FK_ClassClassLecturer FOREIGN KEY (classId) REFERENCES class(id),
+    CONSTRAINT PK_ClassId_LecturerId PRIMARY KEY (lecturerId, classId)
 );
 
 CREATE TABLE student(
     id INTEGER PRIMARY KEY NOT NULL,
     personalIdentifier int, -- 10-stellige Nummer, FH-Ausweis (Personenkennzeichen)
-    username varchar(10) -- laut CIS "username", Schema "ic21bxxx"
+    username varchar(10), -- laut CIS "username", Schema "ic21bxxx"
+    classId int, --2A, 2B, 2C, 2D, 2E
+    CONSTRAINT FK_ClassStudent FOREIGN KEY (classId) REFERENCES class(id)
 );
 
 CREATE TABLE exam(
@@ -56,6 +71,8 @@ CREATE TABLE exam(
     CONSTRAINT FK_LecturerExam FOREIGN KEY (lecturerId) REFERENCES lecturer(id)
 );
 
+/*
+-- nicht mehr benötigt - Studenten sind immer nur Teil einer Klasse
 CREATE TABLE class_student(
     classId int,
     studentId int,
@@ -63,6 +80,7 @@ CREATE TABLE class_student(
     CONSTRAINT FK_StudentClassStudent FOREIGN KEY (studentId) REFERENCES student(id),
     CONSTRAINT PK_ClassId_StudentId PRIMARY KEY (classId, studentId)
 );
+*/
 
 CREATE TABLE student_exam(
     id INTEGER PRIMARY KEY NOT NULL,
