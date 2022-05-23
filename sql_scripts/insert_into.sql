@@ -28,7 +28,7 @@ VALUES  ('BSYS', 'Betriebssysteme'),
         */
 
 INSERT INTO lecturer (firstname, lastname, subjectId)
-VALUES  ('Kevin', 'Perry', 1) ,              -- 1
+VALUES  ('Kevin', 'Perry', 1) ,             -- 1
         ('Robert', 'Trausmuth', 2),         -- 2
         ('Joseph', 'Wenninger', 2),         -- 3
         ('Francoise', 'Porchet', 3),        -- 4
