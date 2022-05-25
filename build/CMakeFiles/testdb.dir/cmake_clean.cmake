@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/testdb.dir/src/dbfunctions.c.o"
+  "CMakeFiles/testdb.dir/src/dbfunctions.c.o.d"
   "CMakeFiles/testdb.dir/testdb.c.o"
   "CMakeFiles/testdb.dir/testdb.c.o.d"
   "testdb"

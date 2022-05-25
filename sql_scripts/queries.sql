@@ -22,6 +22,6 @@ WHERE l.lastname LIKE '%Perry%'
 --get lecturer & subject
 SELECT (l.firstname ||  ' ' || l.lastname) AS LecturerName, s.subjectLabel, s.subject
 FROM lecturer l
-    JOIN subject s ON l.subjectId = s.id
---WHERE l.lastname LIKE '%Perry%'
+    JOIN subject s ON l.subjectId = s.id 
+WHERE l.lastname LIKE '%Perry%'
 

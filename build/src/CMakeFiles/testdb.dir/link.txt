@@ -1,0 +1,1 @@
+/usr/bin/gcc -g CMakeFiles/testdb.dir/__/testdb.c.o CMakeFiles/testdb.dir/dbfunctions.c.o -o testdb 

@@ -11,7 +11,8 @@
 		"commands" : 
 		[
 			"add_executable",
-			"target_link_libraries"
+			"target_link_libraries",
+			"include_directories"
 		],
 		"files" : 
 		[
@@ -25,13 +26,19 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 7,
+				"line" : 10,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 10,
+				"line" : 13,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 6,
 				"parent" : 0
 			}
 		]
@@ -45,10 +52,18 @@
 					"fragment" : "-g"
 				}
 			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/home/ingvar/Documents/projects/Test_DB/include"
+				}
+			],
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -62,7 +77,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-rdynamic",
+				"fragment" : "",
 				"role" : "flags"
 			},
 			{
@@ -86,7 +101,8 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -96,6 +112,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "testdb.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/dbfunctions.c",
 			"sourceGroupIndex" : 0
 		}
 	],

@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/ingvar/Documents/projects/Test_DB/src/dbfunctions.c" "CMakeFiles/testdb.dir/src/dbfunctions.c.o" "gcc" "CMakeFiles/testdb.dir/src/dbfunctions.c.o.d"
   "/home/ingvar/Documents/projects/Test_DB/testdb.c" "CMakeFiles/testdb.dir/testdb.c.o" "gcc" "CMakeFiles/testdb.dir/testdb.c.o.d"
   )
 

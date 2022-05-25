@@ -1,7 +1,12 @@
 [
 {
   "directory": "/home/ingvar/Documents/projects/Test_DB/build",
-  "command": "/usr/bin/gcc   -g -o CMakeFiles/testdb.dir/testdb.c.o -c /home/ingvar/Documents/projects/Test_DB/testdb.c",
+  "command": "/usr/bin/gcc  -I/home/ingvar/Documents/projects/Test_DB/include -g -o CMakeFiles/testdb.dir/testdb.c.o -c /home/ingvar/Documents/projects/Test_DB/testdb.c",
   "file": "/home/ingvar/Documents/projects/Test_DB/testdb.c"
+},
+{
+  "directory": "/home/ingvar/Documents/projects/Test_DB/build",
+  "command": "/usr/bin/gcc  -I/home/ingvar/Documents/projects/Test_DB/include -g -o CMakeFiles/testdb.dir/src/dbfunctions.c.o -c /home/ingvar/Documents/projects/Test_DB/src/dbfunctions.c",
+  "file": "/home/ingvar/Documents/projects/Test_DB/src/dbfunctions.c"
 }
 ]

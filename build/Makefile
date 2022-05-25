@@ -129,6 +129,30 @@ testdb/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/testdb.dir/build.make CMakeFiles/testdb.dir/build
 .PHONY : testdb/fast
 
+src/dbfunctions.o: src/dbfunctions.c.o
+.PHONY : src/dbfunctions.o
+
+# target to build an object file
+src/dbfunctions.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testdb.dir/build.make CMakeFiles/testdb.dir/src/dbfunctions.c.o
+.PHONY : src/dbfunctions.c.o
+
+src/dbfunctions.i: src/dbfunctions.c.i
+.PHONY : src/dbfunctions.i
+
+# target to preprocess a source file
+src/dbfunctions.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testdb.dir/build.make CMakeFiles/testdb.dir/src/dbfunctions.c.i
+.PHONY : src/dbfunctions.c.i
+
+src/dbfunctions.s: src/dbfunctions.c.s
+.PHONY : src/dbfunctions.s
+
+# target to generate assembly for a file
+src/dbfunctions.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testdb.dir/build.make CMakeFiles/testdb.dir/src/dbfunctions.c.s
+.PHONY : src/dbfunctions.c.s
+
 testdb.o: testdb.c.o
 .PHONY : testdb.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... testdb"
+	@echo "... src/dbfunctions.o"
+	@echo "... src/dbfunctions.i"
+	@echo "... src/dbfunctions.s"
 	@echo "... testdb.o"
 	@echo "... testdb.i"
 	@echo "... testdb.s"

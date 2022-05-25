@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.0.0"
+						"string" : "3.10.0"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "testdb::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-testdb-Debug-2be41ad7061c810545ce.json",
+					"jsonFile" : "target-testdb-Debug-e9b8d5da7bd6f8d030d4.json",
 					"name" : "testdb",
 					"projectIndex" : 0
 				}
