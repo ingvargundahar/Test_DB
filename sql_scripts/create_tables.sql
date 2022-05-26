@@ -54,7 +54,7 @@ CREATE TABLE student(
     id INTEGER PRIMARY KEY NOT NULL,
     personalIdentifier int, -- 10-stellige Nummer, FH-Ausweis (Personenkennzeichen)
     username varchar(10), -- laut CIS "username", Schema "ic21bxxx"
-    classId int, --2A, 2B, 2C, 2D, 2E
+    classId int, --2A, 2B, 2C, 2D, 2E => alternativ: combined entries: 2ABC, 2DE etc.
     CONSTRAINT FK_ClassStudent FOREIGN KEY (classId) REFERENCES class(id)
 );
 

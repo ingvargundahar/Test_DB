@@ -7,7 +7,9 @@
 int main(void){
 
     //printf("%s\n", sqlite3_libversion());
-    getDatabaseVersionNumber();
+    //getDatabaseVersionNumber();
+
+    getAllExams();
 
     return EXIT_SUCCESS;
 }
