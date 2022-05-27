@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
+#include <string.h>
 
 int getDatabaseVersionNumber(){
     sqlite3 *db;
@@ -38,7 +39,7 @@ int getDatabaseVersionNumber(){
     sqlite3_close(db);
 }
 
-int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+int printCallback(void *NotUsed, int argc, char **argv, char **azColName) {
     
     NotUsed = 0;
     
@@ -131,7 +132,7 @@ int selectAll(){
     
     char *sql = "SELECT * FROM Cars";
         
-    rc = sqlite3_exec(db, sql, callback, 0, &err_msg);
+    rc = sqlite3_exec(db, sql, printCallback, 0, &err_msg);
     
     if (rc != SQLITE_OK ) {
         
@@ -238,9 +239,16 @@ int parameterQuery(){
     return 0;
 }
 
-/*struct exam* */ int getAllExams(){
+/**
+ * \brief Returns all exams from the database.
+ *
+ * \param examArray The array to save the returned rows to.
+ * \returns int Returns rowcount of query.
+ */
+struct exam * getAllExams(int *returnedRows){
     
     sqlite3 *db;
+    sqlite3_stmt *stmt;
     char *err_msg = 0;
     
     int rc = sqlite3_open("/home/ingvar/Documents/projects/Test_DB/database/testdb.db", &db);
@@ -251,33 +259,100 @@ int parameterQuery(){
                 sqlite3_errmsg(db));
         sqlite3_close(db);
         
-        return 1; //NULL;
+        return NULL; //-1;
     }
     
-    //char *sql = "SELECT * FROM sqlite_master";
+    //count rows first
+    char *sqlCountRows = "SELECT COUNT(e.id) FROM exam e";
+    rc = sqlite3_prepare_v2(db, sqlCountRows, -1, &stmt, 0);
+    if (rc != SQLITE_OK ) {
+        
+        fprintf(stderr, "Failed to select data\n");
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        
+        return NULL; //-1;
+    }
+    rc = sqlite3_step(stmt); 
+    *returnedRows = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    //----
 
-    char *sql = "SELECT e.id, date(e.startDate) AS Date, time(e.startDate) AS Time, (l.firstname ||  ' ' || l.lastname) AS LecturerName, a.label, a.rows, a.columns \
+
+    char *sql = "SELECT e.id, date(e.startDate) AS Date, time(e.startDate) AS Time, (l.firstname ||  ' ' || l.lastname) AS LecturerName, a.label, a.rows, a.columns, e.capacity \
                  FROM exam e \
                     JOIN lecturer l ON e.lecturerId = l.id \
                     JOIN auditorium a ON e.auditoriumId = a.id";
   
 
-    struct exam * examArray = (struct exam *)malloc(sizeof(struct exam));
+    //rc = sqlite3_exec(db, sql, printCallback, examArray, &err_msg);
 
-    rc = sqlite3_exec(db, sql, examStructCallBack, examArray, &err_msg);
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     
     if (rc != SQLITE_OK ) {
         
         fprintf(stderr, "Failed to select data\n");
         fprintf(stderr, "SQL error: %s\n", err_msg);
-
         sqlite3_free(err_msg);
         sqlite3_close(db);
         
-        return 1;
+        return NULL; //-1;
     } 
-    
+
+    int counter = 0;
+    struct exam * examArray = malloc(sizeof(*examArray) * (*returnedRows));
+    //size_t newSize = sizeof(examArray);
+
+    do{
+
+        //struct exam *examEntry = &examArray[counter++];
+
+        rc = sqlite3_step(stmt);
+
+         if (rc == SQLITE_DONE) {
+            //printf("No more rows ...\n");
+            break;
+        } else if (rc != SQLITE_ROW) {
+            fprintf(stderr, "Problem: %s\n", sqlite3_errmsg(db)); 
+            sqlite3_finalize(stmt);
+            return NULL; //-1;
+        }
+
+        examArray[counter].id = sqlite3_column_int(stmt, 0);
+
+        //char * entryDate = (char *) sqlite3_column_text(stmt, 1);
+        examArray[counter].date = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 1)));
+        strcpy(examArray[counter].date , sqlite3_column_text(stmt, 1));
+        //examArray[counter].date = entryDate; // ? entryDate : (char*) "NULL";
+        //strcpy(examEntry->date, sqlite3_column_text(stmt, 1));
+
+        //char * entryTime = (char *) sqlite3_column_text(stmt, 2);
+        examArray[counter].time = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 2)));
+        strcpy(examArray[counter].time , sqlite3_column_text(stmt, 2));
+
+        //char * entryTester = (char *) sqlite3_column_text(stmt, 3);
+        examArray[counter].tester = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 3)));
+        strcpy(examArray[counter].tester , sqlite3_column_text(stmt, 3));
+
+        //char * entryRoom = (char *) sqlite3_column_text(stmt, 4);
+        examArray[counter].room = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 4)));
+        strcpy(examArray[counter].room , sqlite3_column_text(stmt, 4));
+
+        examArray[counter].rows = sqlite3_column_int(stmt, 5);
+        examArray[counter].columns = sqlite3_column_int(stmt, 6);
+        examArray[counter].capacity = sqlite3_column_int(stmt, 7);
+
+        /*
+        newSize += sizeof(struct exam);
+        examArray = realloc(examArray, newSize);
+        */
+       counter++;
+
+    }while(rc == SQLITE_ROW);
+
+    sqlite3_finalize(stmt);
     sqlite3_close(db);
     
-    return 0;
+    return examArray;
 }

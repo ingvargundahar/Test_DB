@@ -26,11 +26,12 @@ struct exam {
 
 
 int getDatabaseVersionNumber();
-int callback(void *NotUsed, int argc, char **argv, char **azColName);
+int printCallback(void *NotUsed, int argc, char **argv, char **azColName);
+int examStructCallBack(void *exam, int argc, char **argv, char **azColName);
 int insertInto();
 int selectAll();
 int lastInsertedId();
 int parameterQuery();
-int getAllExams();
+struct exam * getAllExams(int *returnedRows);
 
 #endif

@@ -1,1 +1,0 @@
-/usr/bin/gcc -fPIC -g -shared -Wl,-soname,libtestdb_library.so -o libtestdb_library.so CMakeFiles/testdb_library.dir/dbfunctions.c.o 

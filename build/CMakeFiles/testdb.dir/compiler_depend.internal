@@ -58,6 +58,10 @@ CMakeFiles/testdb.dir/src/dbfunctions.c.o
  /usr/include/alloca.h
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
  /usr/include/sqlite3.h
+ /usr/include/string.h
+ /usr/include/x86_64-linux-gnu/bits/types/locale_t.h
+ /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h
+ /usr/include/strings.h
 
 CMakeFiles/testdb.dir/testdb.c.o
  /home/ingvar/Documents/projects/Test_DB/testdb.c
