@@ -24,14 +24,13 @@ struct exam {
     int columns;
 };
 
+extern const char* const connectionString;
 
 int getDatabaseVersionNumber();
 int printCallback(void *NotUsed, int argc, char **argv, char **azColName);
-int examStructCallBack(void *exam, int argc, char **argv, char **azColName);
-int insertInto();
-int selectAll();
 int lastInsertedId();
 int parameterQuery();
+int setExam(struct exam newExam);
 struct exam * getAllExams(int *returnedRows);
 
 #endif

@@ -3,16 +3,13 @@
 #include <stdlib.h>
 #include "include/dbfunctions.h"
 
-
 int main(void){
 
-    //printf("%s\n", sqlite3_libversion());
     //getDatabaseVersionNumber();
 
-    //struct exam * examArray = (struct exam *)malloc(sizeof(struct exam *));
-
-    int *rowCount;
-    struct exam * examArray = getAllExams(&rowCount);
+    int rowCount;
+    int *rowCountP = &rowCount;
+    struct exam * examArray = getAllExams(rowCountP);
 
     for(int i = 0; i < rowCount; i++){
         printf("id: %d, date: %s, time: %s, tester: %s, room: %s,  rows: %d, columns: %d, capacity: %d\n", 

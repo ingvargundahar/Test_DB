@@ -43,7 +43,7 @@ VALUES  ('Kevin', 'Perry', 1) ,             -- 1
         */
 
 INSERT INTO class (classname)
-VALUES ('2A'), ('2B'), ('2C'), ('2D'), ('2E')--, ('2CD'), ('2ABE')
+VALUES ('2A'), ('2B'), ('2C'), ('2D'), ('2E') --, ('2CD'), ('2ABE')
 
 INSERT INTO class_lecturer (lecturerId, classId)
 VALUES  (1, 3), (1, 4), (1, 5),     --BSYS: Perry, 2C/D/E
