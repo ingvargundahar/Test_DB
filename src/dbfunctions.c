@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include <string.h>
 
+
 const char* const connectionString = "../database/contacttracing.db";
 
 int getDatabaseVersionNumber(){
@@ -164,14 +165,12 @@ int setExam(struct exam newExam){
     /*
         STEPS
         1. get auditoriumId from name
-        2. get classId from name
-        3. get lecturerId from name
-        4. insert into exam
+        2. get classId & lecturerId from name
+        3. insert into exam
     */
-
     //AUDITORIUM-ID
     int auditoriumId;
-    char *sql = "SELECT auditoriumId FROM auditorium WHERE label = ?";
+    char *sql = "SELECT a.id FROM auditorium a WHERE label = ?";
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (rc == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, newExam.room, -1, SQLITE_STATIC);
@@ -183,15 +182,24 @@ int setExam(struct exam newExam){
     
     if (rc == SQLITE_ROW) {
         auditoriumId = sqlite3_column_int(stmt, 0);
-        printf("%d ", auditoriumId);
+        printf("Auditorium-ID: %d", auditoriumId);
     } 
+    sqlite3_finalize(stmt);
     
-    //CLASS-ID
-    int classId;
-    sql = "SELECT classId FROM class WHERE lecturername = ?";
+    //CLASS-ID & LECTURER-ID
+    int classId, lecturerId;
+    sql =  "SELECT c.id, l.id \
+            FROM lecturer l \
+                JOIN class_lecturer cl ON l.id = cl.lecturerId \
+                JOIN class c ON cl.classId = c.id \
+            WHERE l.lastname LIKE @name";
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (rc == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, newExam.tester, -1, SQLITE_STATIC);
+        int idx = sqlite3_bind_parameter_index(stmt, "@id");
+        //char * likeParam = malloc(sizeof(newExam.tester)*2);
+        //sprintf(likeParam, "%s", newExam.tester);
+        sqlite3_bind_text(stmt, idx, newExam.tester, -1, SQLITE_STATIC);
+        //free(likeParam);
     } else {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     }
@@ -199,35 +207,58 @@ int setExam(struct exam newExam){
     rc = sqlite3_step(stmt);
     
     if (rc == SQLITE_ROW) {
-        auditoriumId = sqlite3_column_int(stmt, 0);
-        printf("%d ", auditoriumId);
+        classId = sqlite3_column_int(stmt, 0);
+        lecturerId = sqlite3_column_int(stmt, 1);
+        printf("%d, %d ", classId, lecturerId);
     } 
-
-
+    sqlite3_finalize(stmt);
 
     sql = "INSERT INTO exam (auditoriumId, classId, lecturerId, startDate, endDate, capacity) \
                     VALUES (?, ?, ?, ?, ?, ?); ";
-        
-    
-    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+                    
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, auditoriumId);
+        sqlite3_bind_int(stmt, 2, classId);
+        sqlite3_bind_int(stmt, 3, lecturerId);
+        char *startDate = malloc(sizeof(newExam.date) + sizeof(newExam.time) + 1);
+        startDate = newExam.date + ' ';
+        strcpy(startDate, newExam.time);
+        sqlite3_bind_text(stmt, 4, startDate,  -1, SQLITE_STATIC);
+
+        time_t newEndDateT = makeDateTimeFromStringAndAddTime(startDate, 3);
+        struct tm * newEndDateTM;
+        gmtime_r(&newEndDateT, newEndDateTM);
+
+        char *endDate = malloc(sizeof(startDate) + 1);
+        strftime(endDate, sizeof(startDate), "%Y-%m-%d %H:%M:%S", newEndDateTM);
+
+        sprintf(endDate, "%d-%d-%d %d:%d:%d", newEndDateTM->tm_year, newEndDateTM->tm_mon, newEndDateTM->tm_mday, newEndDateTM->tm_hour, newEndDateTM->tm_min, newEndDateTM->tm_sec);
+        sqlite3_bind_text(stmt, 5, endDate, -1, SQLITE_STATIC);
+        free(endDate);
+
+        sqlite3_bind_int(stmt, 6, newExam.capacity);
+    } else {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    }
     
     if (rc != SQLITE_OK ) {
         
-        fprintf(stderr, "Failed to create table\n");
+        fprintf(stderr, "Failed to insert exam\n");
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
         
     } else {
         
-        fprintf(stdout, "Table Friends created successfully\n");
+        fprintf(stdout, "Exam inserted successfully\n");
     }
     
-    int last_id = sqlite3_last_insert_rowid(db);
-    printf("The last Id of the inserted row is %d\n", last_id);
+    insertedId = sqlite3_last_insert_rowid(db);
 
     sqlite3_close(db);
     
-    return 0;
+    return insertedId;
 }
 
 /**
@@ -326,4 +357,31 @@ struct exam * getAllExams(int *returnedRows){
     sqlite3_close(db);
     
     return examArray;
+}
+
+time_t makeDateTimeFromStringAndAddTime(const char * const datetimestring, int hoursToAdd){
+    time_t result = 0;
+   
+   int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+   
+   if (sscanf(datetimestring, "%4d-%2d-%2d %2d:%2d:%2d", &year, &month, &day, &hour, &min, &sec) == 6) {
+        struct tm breakdown = {0};
+        breakdown.tm_year = year - 1900; // years since 1900
+        breakdown.tm_mon = month - 1; //0-11 valid
+        breakdown.tm_mday = day;
+        breakdown.tm_hour = hour + hoursToAdd;
+        breakdown.tm_min = min;
+        breakdown.tm_sec = sec;
+     
+       if ((result = mktime(&breakdown)) == (time_t)-1) {
+          fprintf(stderr, "Could not convert time input to time_t\n");
+          return -1;
+       }
+        
+       return result;
+   }
+   else {
+      fprintf(stderr, "The input was not a valid time format\n");
+      return -1;
+   }
 }

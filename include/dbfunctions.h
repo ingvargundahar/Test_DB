@@ -1,6 +1,7 @@
 #ifndef DBFUNCTIONS_H
 #define DBFUNCTIONS_H
 
+#include <time.h>
 
 /**
  * @brief Struct <c> exam </c>
@@ -32,5 +33,6 @@ int lastInsertedId();
 int parameterQuery();
 int setExam(struct exam newExam);
 struct exam * getAllExams(int *returnedRows);
+time_t makeDateTimeFromStringAndAddTime(const char * const datetimestring, int hoursToAdd);
 
 #endif

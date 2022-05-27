@@ -31,3 +31,9 @@ FROM exam e
 
 --[get students from exam]
 
+--[get classId & lecturerId]
+SELECT c.id, l.id
+FROM lecturer l
+    JOIN class_lecturer cl ON l.id = cl.lecturerId
+    JOIN class c ON cl.classId = c.id
+WHERE l.lastname LIKE 'Holz%'
