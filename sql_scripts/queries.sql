@@ -36,4 +36,4 @@ SELECT c.id, l.id
 FROM lecturer l
     JOIN class_lecturer cl ON l.id = cl.lecturerId
     JOIN class c ON cl.classId = c.id
-WHERE l.lastname LIKE 'Holz%'
+WHERE (l.firstname ||  ' ' || l.lastname) LIKE '%Holzer%'

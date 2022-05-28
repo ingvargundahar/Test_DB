@@ -182,36 +182,41 @@ int setExam(struct exam newExam){
     
     if (rc == SQLITE_ROW) {
         auditoriumId = sqlite3_column_int(stmt, 0);
-        printf("Auditorium-ID: %d", auditoriumId);
+        //printf("Auditorium-ID: %d", auditoriumId);
     } 
     sqlite3_finalize(stmt);
     
     //CLASS-ID & LECTURER-ID
     int classId, lecturerId;
-    sql =  "SELECT c.id, l.id \
+    //get needed bytes for sprintf string to build +1 for null-terminator
+    size_t needed = snprintf(NULL, 0, "SELECT c.id, l.id \
             FROM lecturer l \
                 JOIN class_lecturer cl ON l.id = cl.lecturerId \
                 JOIN class c ON cl.classId = c.id \
-            WHERE l.lastname LIKE @name";
+            WHERE l.lastname LIKE '%%%s%%'", (char*) newExam.tester) + 1;
+    //allocate needed bytes
+    sql = malloc(needed); 
+    //build string with sprintf
+    sprintf(sql, "SELECT c.id, l.id \
+            FROM lecturer l \
+                JOIN class_lecturer cl ON l.id = cl.lecturerId \
+                JOIN class c ON cl.classId = c.id \
+            WHERE (l.firstname ||  ' ' || l.lastname) LIKE '%%%s%%'", (char*) newExam.tester);
+
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    if (rc == SQLITE_OK) {
-        int idx = sqlite3_bind_parameter_index(stmt, "@id");
-        //char * likeParam = malloc(sizeof(newExam.tester)*2);
-        //sprintf(likeParam, "%s", newExam.tester);
-        sqlite3_bind_text(stmt, idx, newExam.tester, -1, SQLITE_STATIC);
-        //free(likeParam);
-    } else {
+
+    if (rc != SQLITE_OK) {
+        //sqlite3_bind_text(stmt, 1, (char*) newExam.tester, -1, NULL);
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     }
     
-    rc = sqlite3_step(stmt);
-    
-    if (rc == SQLITE_ROW) {
+    if ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         classId = sqlite3_column_int(stmt, 0);
         lecturerId = sqlite3_column_int(stmt, 1);
-        printf("%d, %d ", classId, lecturerId);
+        //printf("%d, %d ", classId, lecturerId);
     } 
     sqlite3_finalize(stmt);
+    free(sql);
 
     sql = "INSERT INTO exam (auditoriumId, classId, lecturerId, startDate, endDate, capacity) \
                     VALUES (?, ?, ?, ?, ?, ?); ";
@@ -222,28 +227,26 @@ int setExam(struct exam newExam){
         sqlite3_bind_int(stmt, 1, auditoriumId);
         sqlite3_bind_int(stmt, 2, classId);
         sqlite3_bind_int(stmt, 3, lecturerId);
-        char *startDate = malloc(sizeof(newExam.date) + sizeof(newExam.time) + 1);
-        startDate = newExam.date + ' ';
-        strcpy(startDate, newExam.time);
+        char *startDate = malloc(sizeof(newExam.date) + sizeof(newExam.time) + 2); //+2 = space + null-terminator
+        sprintf(startDate, "%s %s", newExam.date, newExam.time);
         sqlite3_bind_text(stmt, 4, startDate,  -1, SQLITE_STATIC);
 
         time_t newEndDateT = makeDateTimeFromStringAndAddTime(startDate, 3);
-        struct tm * newEndDateTM;
-        gmtime_r(&newEndDateT, newEndDateTM);
+        struct tm * newEndDateTM = gmtime(&newEndDateT);
 
         char *endDate = malloc(sizeof(startDate) + 1);
-        strftime(endDate, sizeof(startDate), "%Y-%m-%d %H:%M:%S", newEndDateTM);
+        strftime(endDate, sizeof(endDate), "%Y-%m-%d %X", newEndDateTM);
 
-        sprintf(endDate, "%d-%d-%d %d:%d:%d", newEndDateTM->tm_year, newEndDateTM->tm_mon, newEndDateTM->tm_mday, newEndDateTM->tm_hour, newEndDateTM->tm_min, newEndDateTM->tm_sec);
         sqlite3_bind_text(stmt, 5, endDate, -1, SQLITE_STATIC);
-        free(endDate);
 
         sqlite3_bind_int(stmt, 6, newExam.capacity);
     } else {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     }
     
-    if (rc != SQLITE_OK ) {
+    rc = sqlite3_step(stmt);
+
+    if (rc != SQLITE_DONE){
         
         fprintf(stderr, "Failed to insert exam\n");
         fprintf(stderr, "SQL error: %s\n", err_msg);
@@ -253,11 +256,11 @@ int setExam(struct exam newExam){
         
         fprintf(stdout, "Exam inserted successfully\n");
     }
-    
+
     insertedId = sqlite3_last_insert_rowid(db);
 
     sqlite3_close(db);
-    
+
     return insertedId;
 }
 
@@ -366,8 +369,8 @@ time_t makeDateTimeFromStringAndAddTime(const char * const datetimestring, int h
    
    if (sscanf(datetimestring, "%4d-%2d-%2d %2d:%2d:%2d", &year, &month, &day, &hour, &min, &sec) == 6) {
         struct tm breakdown = {0};
-        breakdown.tm_year = year - 1900; // years since 1900
-        breakdown.tm_mon = month - 1; //0-11 valid
+        breakdown.tm_year = year; // years since 1900
+        breakdown.tm_mon = month; //0-11 valid
         breakdown.tm_mday = day;
         breakdown.tm_hour = hour + hoursToAdd;
         breakdown.tm_min = min;

@@ -9,17 +9,17 @@ int main(void){
 
     struct exam newExam = {0};
     newExam.date = "2022-06-01"; 
-    newExam.time = "19:30";
+    newExam.time = "19:30:00";
     newExam.tester = "Holzer";
     newExam.room = "A1.06";
     newExam.capacity = 50;
 
     int insertedId = setExam(newExam);
-    printf("%d", insertedId);
+    printf("Last inserted id: %d\n", insertedId);
 
     int rowCount;
     int *rowCountP = &rowCount;
-    struct exam * examArray = getAllExams(rowCountP);
+    struct exam *examArray = getAllExams(rowCountP);
 
     for(int i = 0; i < rowCount; i++){
         printf("id: %d, date: %s, time: %s, tester: %s, room: %s,  rows: %d, columns: %d, capacity: %d\n", 
