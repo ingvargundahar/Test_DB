@@ -234,8 +234,11 @@ int setExam(struct exam newExam){
         time_t newEndDateT = makeDateTimeFromStringAndAddTime(startDate, 3);
         struct tm * newEndDateTM = gmtime(&newEndDateT);
 
-        char *endDate = malloc(sizeof(startDate) + 1);
-        strftime(endDate, sizeof(endDate), "%Y-%m-%d %X", newEndDateTM);
+        char endDate[20]; //] = malloc(sizeof(char) * 20);
+
+        //sprintf(endDate, "%d-%d-%d %d:%d:%d", newEndDateTM->tm_year, newEndDateTM->tm_mon, newEndDateTM->tm_mday, newEndDateTM->tm_hour, newEndDateTM->tm_min, newEndDateTM->tm_sec);
+
+        strftime(endDate, sizeof(endDate), "%Y-%m-%d %H:%M:%S", newEndDateTM);
 
         sqlite3_bind_text(stmt, 5, endDate, -1, SQLITE_STATIC);
 
@@ -369,14 +372,14 @@ time_t makeDateTimeFromStringAndAddTime(const char * const datetimestring, int h
    
    if (sscanf(datetimestring, "%4d-%2d-%2d %2d:%2d:%2d", &year, &month, &day, &hour, &min, &sec) == 6) {
         struct tm breakdown = {0};
-        breakdown.tm_year = year; // years since 1900
-        breakdown.tm_mon = month; //0-11 valid
+        breakdown.tm_year = year - 1900; //needed
+        breakdown.tm_mon = month - 1; //needed
         breakdown.tm_mday = day;
         breakdown.tm_hour = hour + hoursToAdd;
         breakdown.tm_min = min;
         breakdown.tm_sec = sec;
      
-       if ((result = mktime(&breakdown)) == (time_t)-1) {
+       if ((result = mktime(&breakdown)) == -1){
           fprintf(stderr, "Could not convert time input to time_t\n");
           return -1;
        }
