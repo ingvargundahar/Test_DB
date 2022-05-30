@@ -11,12 +11,15 @@ DELETE FROM exam
 DELETE FROM student_exam
 */
 
+/*
+-- Changes <2022-05-30>: => Entscheidung exam zu simplifizieren
 INSERT INTO auditorium (label, rows, columns)
 VALUES  ('A6.09', 4, 9), 
         ('F2.01', 6, 10), 
         ('F2.02', 4, 12), 
         ('A3.15', 5, 10), 
         ('A1.06', 6, 8)
+*/
 
 INSERT INTO subject (subjectLabel, subject)
 VALUES  ('BSYS', 'Betriebssysteme'), 
@@ -127,11 +130,18 @@ VALUES  --2ABE2A
 
 
 
-
+/*
+-- Changes <2022-05-30>: => Entscheidung exam zu simplifizieren
 INSERT INTO exam (auditoriumId, classId, lecturerId, startDate, endDate, capacity)
 VALUES  (1, 2, 1, '2022-05-30 17:00:00', '2022-05-30 20:00:00', 50),
         (2, 2, 2, '2022-06-07 17:30:00', '2022-05-30 20:30:00', 100),
         (3, 1, 3, '2022-06-07 15:30:00', '2022-05-30 18:30:00', 25)
+*/
+INSERT INTO exam (lecturerId, startDate, endDate, rows, columns, capacity)
+VALUES  (1, '2022-05-30 17:00:00', '2022-05-30 20:00:00', 4, 9, 50),
+        (2, '2022-06-07 17:30:00', '2022-05-30 20:30:00', 6, 10, 100),
+        (3, '2022-06-07 15:30:00', '2022-05-30 18:30:00', 4, 12, 25)
+
 
 /*
 INSERT INTO student_exam (studentId, examId, seat_row, seat_column)

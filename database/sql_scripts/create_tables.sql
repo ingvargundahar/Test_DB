@@ -15,12 +15,15 @@ DROP TABLE auditorium;
 DROP TABLE class_student;
 */
 
+/*
+-- Changes <2022-05-30>: => Entscheidung exam zu simplifizieren
 CREATE TABLE auditorium(
     id INTEGER PRIMARY KEY NOT NULL,
     label varchar(50),
     rows int,
     columns int
 );
+*/
 
 CREATE TABLE class(
     id INTEGER PRIMARY KEY NOT NULL,
@@ -58,16 +61,21 @@ CREATE TABLE student(
     CONSTRAINT FK_ClassStudent FOREIGN KEY (classId) REFERENCES class(id)
 );
 
+/*
+    Changes <2022-05-30>: => Entscheidung exam zu simplifizieren
+*/
 CREATE TABLE exam(
     id INTEGER PRIMARY KEY NOT NULL,
-    auditoriumId int,
-    classId int,
+    --auditoriumId int,
+    --classId int,
     lecturerId int,
     startDate datetime,
     endDate datetime,
+    rows int,
+    columns int,
     capacity int, --25, 50, 100
-    CONSTRAINT FK_AuditoriumExam FOREIGN KEY (auditoriumId) REFERENCES auditorium(id),
-    CONSTRAINT FK_ClassExam FOREIGN KEY (classId) REFERENCES class(id),
+    --CONSTRAINT FK_AuditoriumExam FOREIGN KEY (auditoriumId) REFERENCES auditorium(id),
+    --CONSTRAINT FK_ClassExam FOREIGN KEY (classId) REFERENCES class(id),
     CONSTRAINT FK_LecturerExam FOREIGN KEY (lecturerId) REFERENCES lecturer(id)
 );
 

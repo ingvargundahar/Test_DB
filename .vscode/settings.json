@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "dbfunctions.h": "c"
+        "dbfunctions.h": "c",
+        "typeinfo": "c"
     }
 }

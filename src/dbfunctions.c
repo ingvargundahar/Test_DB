@@ -145,7 +145,7 @@ int parameterQuery(){
     return 0;
 }
 
-int setExam(struct exam newExam){
+int addExamInDb(struct exam newExam){
     
     sqlite3 *db;
     sqlite3_stmt *stmt;
@@ -164,11 +164,12 @@ int setExam(struct exam newExam){
 
     /*
         STEPS
-        1. get auditoriumId from name
-        2. get classId & lecturerId from name
+        1. get auditoriumId from name //=> <2022-05-30>: auditoriumId not needed anymore
+        2. get classId & lecturerId from name0 //=> <2022-05-30>: classId id not needed anymore
         3. insert into exam
     */
     //AUDITORIUM-ID
+    /*
     int auditoriumId;
     char *sql = "SELECT a.id FROM auditorium a WHERE label = ?";
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -185,23 +186,24 @@ int setExam(struct exam newExam){
         //printf("Auditorium-ID: %d", auditoriumId);
     } 
     sqlite3_finalize(stmt);
+    */
     
-    //CLASS-ID & LECTURER-ID
-    int classId, lecturerId;
+    //CLASS-ID & LECTURER-ID //=> <2022-05-30>: class id not needed anymore
+    int lecturerId; //, classId;
     //get needed bytes for sprintf string to build +1 for null-terminator
-    size_t needed = snprintf(NULL, 0, "SELECT c.id, l.id \
+    size_t needed = snprintf(NULL, 0, "SELECT l.id \
             FROM lecturer l \
                 JOIN class_lecturer cl ON l.id = cl.lecturerId \
                 JOIN class c ON cl.classId = c.id \
-            WHERE l.lastname LIKE '%%%s%%'", (char*) newExam.tester) + 1;
+            WHERE (l.firstname ||  ' ' || l.lastname) LIKE '%%%s%%'", (char*) newExam.name) + 1;
     //allocate needed bytes
-    sql = malloc(needed); 
+    char *sql = malloc(needed); 
     //build string with sprintf
-    sprintf(sql, "SELECT c.id, l.id \
+    sprintf(sql, "SELECT l.id \
             FROM lecturer l \
                 JOIN class_lecturer cl ON l.id = cl.lecturerId \
                 JOIN class c ON cl.classId = c.id \
-            WHERE (l.firstname ||  ' ' || l.lastname) LIKE '%%%s%%'", (char*) newExam.tester);
+            WHERE (l.firstname ||  ' ' || l.lastname) LIKE '%%%s%%'", (char*) newExam.name);
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -211,25 +213,25 @@ int setExam(struct exam newExam){
     }
     
     if ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        classId = sqlite3_column_int(stmt, 0);
-        lecturerId = sqlite3_column_int(stmt, 1);
+        //classId = sqlite3_column_int(stmt, 0); //=> <2022-05-30>: class id not needed anymore
+        lecturerId = sqlite3_column_int(stmt, 0);
         //printf("%d, %d ", classId, lecturerId);
     } 
     sqlite3_finalize(stmt);
     free(sql);
 
-    sql = "INSERT INTO exam (auditoriumId, classId, lecturerId, startDate, endDate, capacity) \
+    sql = "INSERT INTO exam (lecturerId, startDate, endDate, rows, columns, capacity) \
                     VALUES (?, ?, ?, ?, ?, ?); ";
                     
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
-        sqlite3_bind_int(stmt, 1, auditoriumId);
-        sqlite3_bind_int(stmt, 2, classId);
-        sqlite3_bind_int(stmt, 3, lecturerId);
+        //sqlite3_bind_int(stmt, 1, auditoriumId);
+        //sqlite3_bind_int(stmt, 2, classId);
+        sqlite3_bind_int(stmt, 1, lecturerId);
         char *startDate = malloc(sizeof(newExam.date) + sizeof(newExam.time) + 2); //+2 = space + null-terminator
         sprintf(startDate, "%s %s", newExam.date, newExam.time);
-        sqlite3_bind_text(stmt, 4, startDate,  -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, startDate,  -1, SQLITE_STATIC);
 
         time_t newEndDateT = makeDateTimeFromStringAndAddTime(startDate, 3);
         struct tm * newEndDateTM = gmtime(&newEndDateT);
@@ -240,7 +242,10 @@ int setExam(struct exam newExam){
 
         strftime(endDate, sizeof(endDate), "%Y-%m-%d %H:%M:%S", newEndDateTM);
 
-        sqlite3_bind_text(stmt, 5, endDate, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, endDate, -1, SQLITE_STATIC);
+
+        sqlite3_bind_int(stmt, 4, newExam.rows);
+        sqlite3_bind_int(stmt, 5, newExam.columns);
 
         sqlite3_bind_int(stmt, 6, newExam.capacity);
     } else {
@@ -273,7 +278,7 @@ int setExam(struct exam newExam){
  * \param examArray Saves the returned rows to int pointer.
  * \returns struct exam* Returns array of struct exams to be used in main.
  */
-struct exam * getAllExams(int *returnedRows){
+struct exam * getListOfExams(int *returnedRows){
     
     sqlite3 *db;
     sqlite3_stmt *stmt;
@@ -345,15 +350,17 @@ struct exam * getAllExams(int *returnedRows){
         examArray[counter].time = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 2)));
         strcpy(examArray[counter].time , sqlite3_column_text(stmt, 2));
 
-        examArray[counter].tester = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 3)));
-        strcpy(examArray[counter].tester , sqlite3_column_text(stmt, 3));
+        examArray[counter].name = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 3)));
+        strcpy(examArray[counter].name , sqlite3_column_text(stmt, 3));
 
+        /* //=> <2022-05-30>: class id not needed anymore
         examArray[counter].room = (char *)malloc(sizeof(char*) * strlen(sqlite3_column_text(stmt, 4)));
         strcpy(examArray[counter].room , sqlite3_column_text(stmt, 4));
+        */
 
-        examArray[counter].rows = sqlite3_column_int(stmt, 5);
-        examArray[counter].columns = sqlite3_column_int(stmt, 6);
-        examArray[counter].capacity = sqlite3_column_int(stmt, 7);
+        examArray[counter].rows = sqlite3_column_int(stmt, 4);
+        examArray[counter].columns = sqlite3_column_int(stmt, 5);
+        examArray[counter].capacity = sqlite3_column_int(stmt, 6);
 
        counter++;
 
